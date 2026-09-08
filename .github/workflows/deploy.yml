@@ -1,0 +1,28 @@
+name: Build and Deploy Laundry Admin
+
+on:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  deploy:
+    # Runner self-hosted harus terpasang pada mesin target yang memiliki Docker + Docker Compose.
+    runs-on: [self-hosted, linux, docker]
+    steps:
+      - name: Checkout source
+        uses: actions/checkout@v4
+
+      - name: Build dan jalankan container
+        run: |
+          docker compose down --remove-orphans
+          docker compose up -d --build
+
+      - name: Cek kesehatan container
+        run: |
+          sleep 5
+          docker compose ps
+          curl --fail http://localhost:8080

@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Laundrify Admin</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="style.css" />
+</head>
+<body>
+  <aside class="sidebar" id="sidebar">
+    <div class="brand"><span class="brand-mark">✦</span><span>Laundrify</span></div>
+    <div class="workspace"><span>WORKSPACE</span><button class="store-select">Laundry Bersih <b>⌄</b></button></div>
+    <nav>
+      <a class="nav-item active" href="#dashboard" data-page="dashboard"><i>⌂</i> Dashboard</a>
+      <a class="nav-item" href="#orders" data-page="orders"><i>▣</i> Pesanan <span class="badge">8</span></a>
+      <a class="nav-item" href="#customers" data-page="customers"><i>♙</i> Pelanggan</a>
+      <a class="nav-item" href="#services" data-page="services"><i>◈</i> Layanan & Harga</a>
+      <a class="nav-item" href="#payments" data-page="payments"><i>◇</i> Pembayaran</a>
+      <p class="nav-label">PENGELOLAAN</p>
+      <a class="nav-item" href="#reports" data-page="reports"><i>▥</i> Laporan</a>
+      <a class="nav-item" href="#staff" data-page="staff"><i>♧</i> Karyawan</a>
+      <a class="nav-item" href="#settings" data-page="settings"><i>⚙</i> Pengaturan</a>
+    </nav>
+    <div class="sidebar-bottom"><div class="help-card"><span class="help-icon">?</span><strong>Butuh bantuan?</strong><small>Pusat bantuan tersedia untuk Anda.</small><a href="#">Buka bantuan →</a></div><div class="profile"><div class="avatar">AR</div><div><b>Andi Rahman</b><small>Administrator</small></div><button>•••</button></div></div>
+  </aside>
+  <main>
+    <header><button class="menu-toggle" id="menuToggle">☰</button><div><p class="eyebrow">SELAMAT DATANG KEMBALI</p><h1 id="pageTitle">Dashboard</h1></div><div class="header-actions"><button class="icon-button">⌕</button><button class="notification">♢<span></span></button><button class="new-order" id="newOrder">＋ Pesanan baru</button></div></header>
+    <section class="content" id="dashboard">
+      <div class="date-line"><p>Ringkasan operasional laundry Anda hari ini.</p><button class="date-button">▣ &nbsp; 08 September 2026 &nbsp;⌄</button></div>
+      <div class="stats-grid">
+        <article class="stat-card"><div class="stat-icon purple">▣</div><div><span>Total Pesanan</span><h2>128</h2><small class="up">↑ 12,5% <em>dari bulan lalu</em></small></div><div class="mini-chart bars"><b></b><b></b><b></b><b></b><b></b><b></b><b></b></div></article>
+        <article class="stat-card"><div class="stat-icon orange">◌</div><div><span>Dalam Proses</span><h2>24</h2><small class="up">↑ 8,2% <em>dari kemarin</em></small></div><div class="mini-chart dots"><b></b><b></b><b></b><b></b><b></b></div></article>
+        <article class="stat-card"><div class="stat-icon green">♧</div><div><span>Pelanggan Aktif</span><h2>86</h2><small class="up">↑ 5,4% <em>dari bulan lalu</em></small></div><div class="mini-chart line">⌁</div></article>
+        <article class="stat-card"><div class="stat-icon blue">Rp</div><div><span>Pendapatan Bulan Ini</span><h2>Rp8,4jt</h2><small class="up">↑ 18,7% <em>dari bulan lalu</em></small></div><div class="mini-chart line">⌁</div></article>
+      </div>
+      <div class="dashboard-grid">
+        <section class="panel revenue"><div class="panel-head"><div><h3>Ringkasan Pendapatan</h3><p>Pendapatan 7 hari terakhir</p></div><button>Minggu ini ⌄</button></div><div class="chart-area"><div class="y-axis"><span>Rp2jt</span><span>Rp1,5jt</span><span>Rp1jt</span><span>Rp500rb</span><span>Rp0</span></div><div class="chart"><div class="grid-lines"></div><svg viewBox="0 0 700 210" preserveAspectRatio="none"><defs><linearGradient id="fill" x1="0" x2="0" y1="0" y2="1"><stop stop-color="#7557f7" stop-opacity=".26"/><stop offset="1" stop-color="#7557f7" stop-opacity="0"/></linearGradient></defs><path d="M0 174 L100 155 L200 168 L300 91 L400 118 L500 55 L600 72 L700 16 L700 210 L0 210Z" fill="url(#fill)"/><path d="M0 174 L100 155 L200 168 L300 91 L400 118 L500 55 L600 72 L700 16" fill="none" stroke="#7457ed" stroke-width="4"/></svg><div class="x-axis"><span>Sen</span><span>Sel</span><span>Rab</span><span>Kam</span><span>Jum</span><span>Sab</span><span>Min</span><span>Hari ini</span></div></div></div><div class="revenue-foot"><div><span>Total Pendapatan</span><strong>Rp8.420.000</strong></div><div><span>Rata-rata / hari</span><strong>Rp1.202.857</strong></div><a href="#reports">Lihat laporan →</a></div></section>
+        <section class="panel status"><div class="panel-head"><div><h3>Status Pesanan</h3><p>Update pesanan hari ini</p></div><button class="dots-btn">•••</button></div><div class="donut-wrap"><div class="donut"><div><b>128</b><span>Pesanan</span></div></div><ul><li><i class="dot purple-dot"></i><span>Dalam proses</span><b>24</b></li><li><i class="dot orange-dot"></i><span>Menunggu diambil</span><b>18</b></li><li><i class="dot green-dot"></i><span>Selesai</span><b>72</b></li><li><i class="dot gray-dot"></i><span>Dibatalkan</span><b>14</b></li></ul></div><a class="full-link" href="#orders">Lihat semua pesanan →</a></section>
+      </div>
+      <section class="panel recent"><div class="panel-head"><div><h3>Pesanan Terbaru</h3><p>Pesanan yang baru masuk dan perlu perhatian.</p></div><button class="outline-button" id="allOrders">Lihat semua</button></div><div class="table-wrap"><table><thead><tr><th>ID PESANAN</th><th>PELANGGAN</th><th>LAYANAN</th><th>BERAT</th><th>TOTAL</th><th>STATUS</th><th></th></tr></thead><tbody id="orderRows"><tr><td><b>#LD-1048</b></td><td><div class="customer"><span class="small-avatar av-1">SA</span><span><b>Siti Aminah</b><small>08xx-xxxx-2187</small></span></div></td><td>Cuci Kering Lipat</td><td>4,5 kg</td><td><b>Rp31.500</b></td><td><span class="status-chip process">● Diproses</span></td><td>⋮</td></tr><tr><td><b>#LD-1047</b></td><td><div class="customer"><span class="small-avatar av-2">BR</span><span><b>Budi Ramadhan</b><small>08xx-xxxx-4521</small></span></div></td><td>Express</td><td>2 kg</td><td><b>Rp28.000</b></td><td><span class="status-chip wait">● Menunggu</span></td><td>⋮</td></tr><tr><td><b>#LD-1046</b></td><td><div class="customer"><span class="small-avatar av-3">DP</span><span><b>Dewi Permata</b><small>08xx-xxxx-7320</small></span></div></td><td>Cuci Setrika</td><td>6 kg</td><td><b>Rp42.000</b></td><td><span class="status-chip done">● Selesai</span></td><td>⋮</td></tr></tbody></table></div></section>
+    </section>
+  </main>
+  <div class="modal-backdrop" id="modal"><form class="modal"><button type="button" class="close" id="closeModal">×</button><h2>Pesanan Baru</h2><p>Catat pesanan laundry pelanggan.</p><label>Nama pelanggan<input placeholder="Masukkan nama pelanggan" required></label><label>Layanan<select><option>Cuci Kering Lipat</option><option>Cuci Setrika</option><option>Express</option></select></label><label>Berat (kg)<input type="number" min="1" placeholder="Contoh: 3" required></label><button class="submit" type="submit">Simpan pesanan</button></form></div>
+  <script src="app.js"></script>
+</body>
+</html>

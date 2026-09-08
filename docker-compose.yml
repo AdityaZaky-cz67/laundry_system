@@ -1,0 +1,8 @@
+services:
+  laundry-admin:
+    build: .
+    image: laundry-admin:latest
+    container_name: laundry-admin
+    ports:
+      - "8080:80"
+    restart: unless-stopped
