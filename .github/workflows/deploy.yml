@@ -11,7 +11,7 @@ permissions:
 jobs:
   deploy:
     # Runner self-hosted harus terpasang pada mesin target yang memiliki Docker + Docker Compose.
-    runs-on: [self-hosted, linux, docker]
+    runs-on: "self-hosted, linux, docker"
     steps:
       - name: Checkout source
         uses: actions/checkout@v4
