@@ -10,7 +10,6 @@ permissions:
 
 jobs:
   deploy:
-    # Runner self-hosted harus terpasang pada mesin target yang memiliki Docker + Docker Compose.
     runs-on: [self-hosted, Windows, X64]
     steps:
       - name: Checkout source
@@ -19,10 +18,37 @@ jobs:
       - name: Build dan jalankan container
         run: |
           docker compose down --remove-orphans
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
+
           docker compose up -d --build
+          if ($LASTEXITCODE -ne 0) { exit $LASTEXITCODE }
 
       - name: Cek kesehatan container
         run: |
-          sleep 5
           docker compose ps
-          curl --fail http://localhost:8080
+
+          $maxAttempts = 12
+          $attempt = 0
+          $healthy = $false
+
+          while ($attempt -lt $maxAttempts) {
+            try {
+              $response = Invoke-WebRequest -Uri http://localhost:8080 -UseBasicParsing -TimeoutSec 5
+              if ($response.StatusCode -eq 200) {
+                $healthy = $true
+                break
+              }
+            } catch {
+              Write-Host "Belum siap, mencoba lagi... (attempt $($attempt+1)/$maxAttempts)"
+            }
+            Start-Sleep -Seconds 5
+            $attempt++
+          }
+
+          if (-not $healthy) {
+            Write-Host "Container tidak sehat setelah $maxAttempts percobaan"
+            docker compose logs
+            exit 1
+          }
+
+          Write-Host "Container sehat!"
