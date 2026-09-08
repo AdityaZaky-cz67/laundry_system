@@ -1,6 +1,6 @@
 # Laundrify — Admin Dashboard
 
-Dashboard statis untuk pengelolaan laundry: ringkasan pesanan, pelanggan, layanan, pembayaran, karyawan, dan laporan. Dibuat dengan HTML, CSS, dan JavaScript tanpa framework.
+Dashboard admin laundry full-stack dengan frontend HTML/CSS/JavaScript, API Node.js/Express, dan database MySQL.
 
 ## Jalankan lokal dengan Docker
 
@@ -8,7 +8,9 @@ Dashboard statis untuk pengelolaan laundry: ringkasan pesanan, pelanggan, layana
 docker compose up -d --build
 ```
 
-Buka `http://localhost:8080`. Hentikan dengan `docker compose down`.
+Buka `http://localhost:8080`. Data disimpan pada volume Docker `mysql_data`. Hentikan dengan `docker compose down`.
+
+Endpoint API utama: `/api/dashboard`, `/api/orders`, `/api/customers`, `/api/services`, `/api/payments`, dan `/api/staff`.
 
 ## CI/CD dengan GitHub self-hosted runner
 
