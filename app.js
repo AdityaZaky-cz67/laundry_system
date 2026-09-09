@@ -69,7 +69,7 @@ function goLinks(){document.querySelectorAll('#app [data-go]').forEach(b=>b.oncl
 
 // Halaman daftar data
 const STATUSES=['Diproses','Menunggu diambil','Selesai'];
-const statusCell=x=>`<select class="sel" data-id="${x.id}">${STATUSES.map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select>`;
+const statusCell=x=>x.status==='Selesai'?`<span class="chip Selesai">Selesai ✓ terkunci</span>`:`<select class="sel" data-id="${x.id}">${STATUSES.map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select>`;
 const payCell=x=>x.payment_status==='Lunas'?`<span class="chip Lunas">Lunas ✓ terkunci</span>`:`<button class="act pay" data-id="${x.id}">Setor</button>`;
 function bindRowActions(reload){
 document.querySelectorAll('#rows .sel').forEach(s=>s.onchange=async()=>{const old=s.value;try{await api('orders/'+s.dataset.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s.value})});toast('Status pesanan diperbarui');reload()}catch(e){s.value=old;toast(e.message)}});

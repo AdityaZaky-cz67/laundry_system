@@ -1,5 +1,24 @@
 # Changelog
 
+## 2026-09-09 — Lock status `Selesai` (final, seperti Lunas)
+
+### Konteks
+Admin meminta: setelah status pesanan mencapai **Selesai**, statusnya tidak bisa diubah lagi — dropdown tidak bisa diklik.
+
+### Yang berubah
+- `server.js` — `PUT /api/:type/:id`: satu `SELECT` membaca baris pesanan saat ini; jika statusnya sudah `Selesai` dan body meminta status selain `Selesai` → 400 `Pesanan yang sudah selesai tidak dapat diubah statusnya`. Lock Lunas digabung di check yang sama. Lock pembayaran tetap independen (pesanan Selesai+Belum Lunas masih bisa di-Setor).
+- `app.js` — `statusCell`: pesanan `Selesai` menampilkan chip **Selesai ✓ terkunci** (bukan dropdown, tidak bisa diklik); selain itu dropdown seperti semula.
+
+### Bukti
+- e2e (jsdom) dijalankan di **DB test terpisah** (container disposable, port 8090) agar data produksi user tidak tersentuh: **51 pass / 0 fail**, termasuk: dropdown hanya di pesanan belum selesai (2 dari 3); pesanan Selesai tampil chip terkunci; setelah diubah ke Selesai via dropdown → chip terkunci muncul; `PUT {status:'Diproses'}` pada pesanan Selesai → **400** dan data tetap `Selesai`; Setor tetap berfungsi pada Selesai+Belum Lunas; lock Lunas tetap jalan; laporan pendapatan otomatis.
+- Data live user (4 pesanan, termasuk LD-1049 hasil pemakaian) tidak berubah selama pengujian.
+
+### Dampak
+- Alur status final: Diproses → Menunggu diambil → Selesai (terkunci). Pembayaran tetap bebas dicatat kapan pun sampai Lunas (terkunci).
+
+### Rollback
+`git revert <hash>` → dropdown muncul lagi di semua baris; backend menerima perubahan status pesanan Selesai.
+
 ## 2026-09-09 — Fitur ubah status pesanan & pembayaran (dengan penguncian Lunas)
 
 ### Konteks
