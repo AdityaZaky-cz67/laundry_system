@@ -68,21 +68,41 @@ goLinks()}
 function goLinks(){document.querySelectorAll('#app [data-go]').forEach(b=>b.onclick=()=>{const l=navLinks.find(a=>a.dataset.p===b.dataset.go);if(l)l.click()})}
 
 // Halaman daftar data
+const STATUSES=['Diproses','Menunggu diambil','Selesai'];
+const statusCell=x=>`<select class="sel" data-id="${x.id}">${STATUSES.map(s=>`<option ${s===x.status?'selected':''}>${s}</option>`).join('')}</select>`;
+const payCell=x=>x.payment_status==='Lunas'?`<span class="chip Lunas">Lunas ✓ terkunci</span>`:`<button class="act pay" data-id="${x.id}">Setor</button>`;
+function bindRowActions(reload){
+document.querySelectorAll('#rows .sel').forEach(s=>s.onchange=async()=>{const old=s.value;try{await api('orders/'+s.dataset.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({status:s.value})});toast('Status pesanan diperbarui');reload()}catch(e){s.value=old;toast(e.message)}});
+document.querySelectorAll('#rows .pay').forEach(b=>b.onclick=async()=>{if(!confirm('Catat pembayaran pesanan ini sebagai Lunas?\nSetelah dicatat, tidak dapat diubah kembali.'))return;try{await api('orders/'+b.dataset.id,{method:'PUT',headers:{'Content-Type':'application/json'},body:JSON.stringify({payment_status:'Lunas'})});toast('Pembayaran dicatat — otomatis masuk pendapatan laporan');reload()}catch(e){toast(e.message)}})}
 const listMeta={
-orders:{cols:['KODE','PELANGGAN','LAYANAN','BERAT','TOTAL','STATUS','PEMBAYARAN'],row:x=>`<td><b>${esc(x.code)}</b></td><td>${person(x.customer,x.phone)}</td><td>${esc(x.service)}</td><td>${num(x.weight)} kg</td><td><b>${money(x.total)}</b></td><td>${chip(x.status)}</td><td>${chip(x.payment_status)}</td>`},
-customers:{cols:['PELANGGAN','TELEPON','ALAMAT','PESANAN'],row:x=>`<td>${person(x.name,x.phone)}</td><td>${esc(x.phone)}</td><td>${esc(x.address||'-')}</td><td>${x.order_count}</td>`},
+orders:{cols:['KODE','PELANGGAN','LAYANAN','BERAT','TOTAL','STATUS','PEMBAYARAN'],row:x=>`<td><b>${esc(x.code)}</b></td><td>${person(x.customer,x.phone)}</td><td>${esc(x.service)}</td><td>${num(x.weight)} kg</td><td><b>${money(x.total)}</b></td><td>${statusCell(x)}</td><td>${payCell(x)}</td>`},
+customers:{cols:['PELANGGAN','TELEPON','ALAMAT','PESANAN'],aksi:x=>`<button class="act" data-view="${x.id}">Lihat</button> `,row:x=>`<td>${person(x.name,x.phone)}</td><td>${esc(x.phone)}</td><td>${esc(x.address||'-')}</td><td>${x.order_count}</td>`},
 services:{cols:['LAYANAN','HARGA/KG','DURASI'],row:x=>`<td>${esc(x.name)}</td><td><b>${money(x.price)}</b></td><td>${esc(x.duration)}</td>`},
 staff:{cols:['NAMA','PERAN','TELEPON'],row:x=>`<td>${person(x.name)}</td><td>${esc(x.role)}</td><td>${esc(x.phone)}</td>`},
-payments:{cols:['KODE','PELANGGAN','TOTAL','METODE','STATUS'],row:x=>`<td><b>${esc(x.code)}</b></td><td>${person(x.customer)}</td><td><b>${money(x.total)}</b></td><td>${esc(x.payment_method)}</td><td>${chip(x.payment_status)}</td>`}};
+payments:{cols:['KODE','PELANGGAN','TOTAL','METODE','STATUS'],row:x=>`<td><b>${esc(x.code)}</b></td><td>${person(x.customer)}</td><td><b>${money(x.total)}</b></td><td>${esc(x.payment_method)}</td><td>${payCell(x)}</td>`}};
 function list(type){const m=listMeta[type];
 $('#app').innerHTML=`<div class="top"><div><p>Kelola data ${names[type].toLowerCase()}.</p></div><button class="primary" id="addData">＋ Tambah ${names[type]}</button></div>
 <section class="panel"><div class="panelhead"><div><h3>Data ${names[type]}</h3><p>Tambahkan data baru atau hapus data yang sudah tidak aktif.</p></div><button class="filter" id="ref">↻ Muat ulang</button></div>
 <div class="tablewrap"><table><thead><tr>${m.cols.map(c=>`<th>${c}</th>`).join('')}<th>AKSI</th></tr></thead><tbody id="rows"><tr><td colspan="8">Memuat...</td></tr></tbody></table></div></section>`;
 $('#ref').onclick=()=>page(type);
 $('#addData').onclick=()=>openAdd(type);
-api(type).then(data=>{$('#rows').innerHTML=data.map(x=>`<tr>${m.row(x)}<td><button class="act del" data-id="${x.id}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="8">Belum ada data.</td></tr>';
-document.querySelectorAll('#rows .act').forEach(b=>b.onclick=async()=>{if(!confirm('Hapus data ini?'))return;
+api(type).then(data=>{$('#rows').innerHTML=data.map(x=>`<tr>${m.row(x)}<td>${m.aksi?m.aksi(x):''}<button class="act del" data-id="${x.id}">Hapus</button></td></tr>`).join('')||'<tr><td colspan="8">Belum ada data.</td></tr>';
+bindRowActions(()=>page(type));
+document.querySelectorAll('#rows .act[data-view]').forEach(b=>b.onclick=()=>customerDetail(b.dataset.view));
+document.querySelectorAll('#rows .act.del').forEach(b=>b.onclick=async()=>{if(!confirm('Hapus data ini?'))return;
 try{await api(type+'/'+b.dataset.id,{method:'DELETE'});toast('Data dihapus');page(type)}catch(e){toast(e.message)}})}).catch(e=>{$('#rows').innerHTML=`<tr><td colspan="8">${esc(e.message)}</td></tr>`})}
+async function customerDetail(cid){
+$('#title').textContent='Pelanggan';
+$('#app').innerHTML=`<div class="top"><div><p>Detail pesanan pelanggan — ubah status atau catat pembayaran.</p></div><button class="filter" id="back">← Kembali ke Pelanggan</button></div>
+<section class="panel"><div class="panelhead"><div><h3 id="cdName">Memuat...</h3><p>Pilih status pesanan atau tandai Lunas.</p></div></div>
+<div class="tablewrap"><table><thead><tr><th>KODE</th><th>LAYANAN</th><th>TOTAL</th><th>STATUS</th><th>PEMBAYARAN</th><th>TANGGAL</th></tr></thead><tbody id="rows"><tr><td colspan="6">Memuat...</td></tr></tbody></table></div></section>`;
+$('#back').onclick=()=>page('customers');
+try{
+const d=await api('customers/'+cid+'/orders');
+$('#cdName').textContent=d.customer.name+' — '+d.customer.phone;
+$('#rows').innerHTML=d.orders.map(x=>`<tr><td><b>${esc(x.code)}</b></td><td>${esc(x.service)} (${num(x.weight)} kg)</td><td><b>${money(x.total)}</b></td><td>${statusCell(x)}</td><td>${payCell(x)}</td><td>${esc(x.created_at.slice(0,10))}</td></tr>`).join('')||'<tr><td colspan="6">Belum ada pesanan.</td></tr>';
+bindRowActions(()=>customerDetail(cid));
+}catch(e){$('#rows').innerHTML=`<tr><td colspan="6">${esc(e.message)}</td></tr>`}}
 
 // Laporan & pengaturan
 async function reports(){const d=await api('dashboard');const by={};

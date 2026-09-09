@@ -1,5 +1,33 @@
 # Changelog
 
+## 2026-09-09 — Fitur ubah status pesanan & pembayaran (dengan penguncian Lunas)
+
+### Konteks
+Admin butuh kendali langsung dari dashboard: ubah status pesanan (Diproses / Menunggu diambil / Selesai), catat pembayaran (Belum Lunas → Lunas) di menu Pesanan dan Pembayaran, serta melihat detail pesanan per pelanggan. Aturan bisnis: pembayaran yang sudah disetujui (Lunas) **tidak boleh** dikembalikan ke Belum Lunas; nilai yang dilunasi otomatis masuk ke pendapatan di Laporan.
+
+### Yang berubah
+- `server.js`:
+  - `PUT /api/:type/:id` — aturan lock: mengubah `payment_status` pesanan yang sudah `Lunas` menjadi selain Lunas → 400 `Pembayaran yang sudah lunas tidak dapat diubah kembali` (sumber kebenaran di backend, bukan hanya di UI).
+  - Endpoint baru `GET /api/customers/:id/orders` — profil pelanggan + semua pesanannya (JOIN layanan & total, untuk halaman detail).
+  - `orderSql` dipecah jadi `orderBase` + `ORDER BY` agar bisa dipakai dengan `WHERE`.
+- `app.js`:
+  - Baris tabel **Pesanan** & **Pembayaran**: status menjadi dropdown (`Diproses / Menunggu diambil / Selesai`, simpan saat diubah) + kolom pembayaran: pesanan Belum Lunas dapat tombol **Setor**, pesanan Lunas tampil chip **Lunas ✓ terkunci** (tanpa kontrol).
+  - Halaman **Pelanggan**: tombol **Lihat** di tiap baris → halaman detail per pelanggan (nama, telepon, daftar pesanannya dengan dropdown status + tombol Setor/chip terkunci, tombol ← Kembali).
+  - Konfirmasi sebelum Setor ("tidak dapat diubah kembali"); toast sukses/gagal memakai pesan server.
+- `style.css` — kelas `.sel` (dropdown kompak di tabel).
+
+### Bukti
+- e2e (jsdom ke docker compose): **47 pass / 0 fail**, termasuk: ubah status tersimpan ke DB; Setor → `Lunas` di DB + chip terkunci; upaya balik ke `Belum Lunas` → **400** dan data tetap `Lunas`; Laporan pendapatan otomatis bertambah (Rp73.500 → **Rp101.500** setelah LD-1047 dilunasi); detail pelanggan menampilkan pesanannya + kontrol; tombol kembali berfungsi.
+- `curl`: `PUT /api/orders/2 {payment_status:'Belum Lunas'}` pada baris Lunas → 400 + pesan lock; `PUT {status:'Selesai'}` → 200 (status tetap bisa diubah); `GET /api/customers/2/orders` → JSON customer + orders.
+- Data dikembalikan ke kondisi sebelum tes; data pelanggan baru (Rahmat) hasil pemakaian user dipertahankan.
+
+### Dampak
+- Admin bisa kelola status & pembayaran langsung dari dashboard; laporan pendapatan selalu konsisten dengan data Lunas.
+- Lock Lunas berlaku di semua jalur (UI maupun API langsung).
+
+### Rollback
+`git revert <hash>` → kembali ke tampilan read-only (tanpa dropdown/Setor), tanpa lock Lunas, tanpa halaman detail pelanggan.
+
 ## 2026-09-09 — Perbaikan backend (crash saat buat pesanan) & frontend (tampilan mati setelah revisi5)
 
 ### Konteks
